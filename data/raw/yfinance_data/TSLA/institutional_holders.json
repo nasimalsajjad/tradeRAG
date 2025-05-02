@@ -1,0 +1,82 @@
+{
+    "0": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Vanguard Group Inc",
+        "pctHeld": 0.075500004,
+        "Shares": 243193181,
+        "Value": 71102389141,
+        "pctChange": 0.0149
+    },
+    "1": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Blackrock Inc.",
+        "pctHeld": 0.062800005,
+        "Shares": 202186537,
+        "Value": 59113276835,
+        "pctChange": 0.0382
+    },
+    "2": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "State Street Corporation",
+        "pctHeld": 0.0348,
+        "Shares": 112211396,
+        "Value": 32807245300,
+        "pctChange": 0.0045
+    },
+    "3": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Geode Capital Management, LLC",
+        "pctHeld": 0.0189,
+        "Shares": 61011604,
+        "Value": 17837962363,
+        "pctChange": 0.0279
+    },
+    "4": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Morgan Stanley",
+        "pctHeld": 0.0139999995,
+        "Shares": 44967162,
+        "Value": 13147048934,
+        "pctChange": 0.1228
+    },
+    "5": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Capital World Investors",
+        "pctHeld": 0.0128,
+        "Shares": 41219130,
+        "Value": 12051236836,
+        "pctChange": -0.0372
+    },
+    "6": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "JPMORGAN CHASE & CO",
+        "pctHeld": 0.0112,
+        "Shares": 35989404,
+        "Value": 10522221871,
+        "pctChange": 0.1346
+    },
+    "7": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "NORGES BANK",
+        "pctHeld": 0.0111,
+        "Shares": 35707824,
+        "Value": 10439896328,
+        "pctChange": 0.1582
+    },
+    "8": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "FMR, LLC",
+        "pctHeld": 0.0108,
+        "Shares": 34661400,
+        "Value": 10133953348,
+        "pctChange": 0.401
+    },
+    "9": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Northern Trust Corporation",
+        "pctHeld": 0.0089,
+        "Shares": 28579615,
+        "Value": 8355821898,
+        "pctChange": 0.2159
+    }
+}

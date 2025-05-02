@@ -1,0 +1,11 @@
+{
+    "category": "company",
+    "datetime": 1745489400,
+    "headline": "Microsoft Just Showed the Future of AI, and It's Great News for Intel and AMD",
+    "id": 134059150,
+    "image": "https://s.yimg.com/rz/stage/p/yahoo_finance_en-US_h_p_finance_2.png",
+    "related": "AMD",
+    "source": "Yahoo",
+    "summary": "The most powerful generative AI models from the likes of OpenAI, Alphabet, and Anthropic require costly and power-hungry AI accelerators stuffed into data centers to produce results.  AI models from Chinese start-up DeepSeek released earlier this year turned some assumptions about the AI infrastructure market on their heads.  The assumption that AI models would require ever-increasing quantities of computational horsepower, the foundation of the bull case for Nvidia stock, started to look a lot less like a sure thing.",
+    "url": "https://finnhub.io/api/news?id=9b4d41e27bfe41122c4fa5fb652a30b614a142d89f13c4542281e3b15a619947"
+}

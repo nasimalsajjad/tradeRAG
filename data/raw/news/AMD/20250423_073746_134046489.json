@@ -1,0 +1,11 @@
+{
+    "category": "company",
+    "datetime": 1745408266,
+    "headline": "AI Chips Today - Docker Advances AI Strategy With New MCP Tools Launch",
+    "id": 134046489,
+    "image": "https://s.yimg.com/rz/stage/p/yahoo_finance_en-US_h_p_finance_2.png",
+    "related": "AMD",
+    "source": "Yahoo",
+    "summary": "Docker, Inc. has announced a significant advancement in its AI strategy with the launch of the Docker MCP Catalog and Docker MCP Toolkit, both built around the emerging Model Context Protocol (MCP). These new offerings aim to streamline AI tool development by integrating Docker's simplicity and security into the MCP ecosystem, allowing developers to easily discover and manage MCP tools through Docker Hub. By partnering with industry leaders such as Elastic, Heroku at Salesforce, and New...",
+    "url": "https://finnhub.io/api/news?id=ff6ff008224acf79518326cb373911b8d465a37ec99928abccfcfaa81a3dd3d7"
+}

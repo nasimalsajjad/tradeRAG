@@ -1,0 +1,62 @@
+{
+    "2026-04-20 06:59:00-04:00": {
+        "EPS Estimate": null,
+        "Reported EPS": null,
+        "Surprise(%)": null
+    },
+    "2026-01-27 16:00:00-05:00": {
+        "EPS Estimate": null,
+        "Reported EPS": null,
+        "Surprise(%)": null
+    },
+    "2025-10-21 16:07:00-04:00": {
+        "EPS Estimate": null,
+        "Reported EPS": null,
+        "Surprise(%)": null
+    },
+    "2025-07-21 16:00:00-04:00": {
+        "EPS Estimate": null,
+        "Reported EPS": null,
+        "Surprise(%)": null
+    },
+    "2025-04-22 16:07:00-04:00": {
+        "EPS Estimate": 0.39,
+        "Reported EPS": 0.27,
+        "Surprise(%)": -30.95
+    },
+    "2025-01-29 16:12:00-05:00": {
+        "EPS Estimate": 0.76,
+        "Reported EPS": 0.73,
+        "Surprise(%)": -4.25
+    },
+    "2024-10-23 16:07:00-04:00": {
+        "EPS Estimate": 0.58,
+        "Reported EPS": 0.72,
+        "Surprise(%)": 23.24
+    },
+    "2024-07-23 16:07:00-04:00": {
+        "EPS Estimate": 0.62,
+        "Reported EPS": 0.52,
+        "Surprise(%)": -16.62
+    },
+    "2024-04-23 16:04:00-04:00": {
+        "EPS Estimate": 0.51,
+        "Reported EPS": 0.45,
+        "Surprise(%)": -12.04
+    },
+    "2024-01-24 16:00:00-05:00": {
+        "EPS Estimate": 0.74,
+        "Reported EPS": 0.71,
+        "Surprise(%)": -4.39
+    },
+    "2023-10-18 16:08:00-04:00": {
+        "EPS Estimate": 0.72,
+        "Reported EPS": 0.66,
+        "Surprise(%)": -8.25
+    },
+    "2023-07-19 16:05:00-04:00": {
+        "EPS Estimate": 0.82,
+        "Reported EPS": 0.91,
+        "Surprise(%)": 10.63
+    }
+}

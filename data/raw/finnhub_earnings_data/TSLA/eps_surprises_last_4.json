@@ -1,0 +1,42 @@
+[
+    {
+        "actual": 0.27,
+        "estimate": 0.4159,
+        "period": "2025-03-31",
+        "quarter": 1,
+        "surprise": -0.1459,
+        "surprisePercent": -35.0805,
+        "symbol": "TSLA",
+        "year": 2025
+    },
+    {
+        "actual": 0.73,
+        "estimate": 0.7777,
+        "period": "2024-12-31",
+        "quarter": 4,
+        "surprise": -0.0477,
+        "surprisePercent": -6.1335,
+        "symbol": "TSLA",
+        "year": 2024
+    },
+    {
+        "actual": 0.72,
+        "estimate": 0.5959,
+        "period": "2024-09-30",
+        "quarter": 3,
+        "surprise": 0.1241,
+        "surprisePercent": 20.8256,
+        "symbol": "TSLA",
+        "year": 2024
+    },
+    {
+        "actual": 0.52,
+        "estimate": 0.6361,
+        "period": "2024-06-30",
+        "quarter": 2,
+        "surprise": -0.1161,
+        "surprisePercent": -18.2518,
+        "symbol": "TSLA",
+        "year": 2024
+    }
+]

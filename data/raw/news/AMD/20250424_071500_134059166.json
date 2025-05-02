@@ -1,0 +1,11 @@
+{
+    "category": "company",
+    "datetime": 1745493300,
+    "headline": "Nasdaq Bear Market: Is AMD or Nvidia the Best Buy Now?",
+    "id": 134059166,
+    "image": "https://s.yimg.com/rz/stage/p/yahoo_finance_en-US_h_p_finance_2.png",
+    "related": "AMD",
+    "source": "Yahoo",
+    "summary": "Nvidia (NASDAQ: NVDA) and AMD (NASDAQ: AMD) are two of the biggest providers of artificial intelligence (AI) computing hardware, but Nvidia is much larger and more successful than AMD in this regard.  Nvidia's CEO and co-founder, Jensen Huang, invented the GPU in 1999, and AMD also makes GPUs.  This makes them ideal for workloads that need intense computing power, like AI.",
+    "url": "https://finnhub.io/api/news?id=c46e25889e3eccb5a7efb56949fbf271e06294024c064e8321d380527b59871f"
+}

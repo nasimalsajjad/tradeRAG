@@ -1,0 +1,42 @@
+[
+    {
+        "actual": 1.09,
+        "estimate": 1.0885,
+        "period": "2024-12-31",
+        "quarter": 4,
+        "surprise": 0.0015,
+        "surprisePercent": 0.1378,
+        "symbol": "AMD",
+        "year": 2024
+    },
+    {
+        "actual": 0.92,
+        "estimate": 0.9246,
+        "period": "2024-09-30",
+        "quarter": 3,
+        "surprise": -0.0046,
+        "surprisePercent": -0.4975,
+        "symbol": "AMD",
+        "year": 2024
+    },
+    {
+        "actual": 0.69,
+        "estimate": 0.6829,
+        "period": "2024-06-30",
+        "quarter": 2,
+        "surprise": 0.0071,
+        "surprisePercent": 1.0397,
+        "symbol": "AMD",
+        "year": 2024
+    },
+    {
+        "actual": 0.62,
+        "estimate": 0.6154,
+        "period": "2024-03-31",
+        "quarter": 1,
+        "surprise": 0.0046,
+        "surprisePercent": 0.7475,
+        "symbol": "AMD",
+        "year": 2024
+    }
+]

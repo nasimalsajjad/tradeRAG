@@ -1,0 +1,33 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+
+# RAG & LLM
+langchain
+llama-index
+openai
+llama-index-embeddings-huggingface
+sentence-transformers
+torch
+
+# Data Fetching
+sec-edgar-downloader
+finnhub-python
+yfinance
+
+# Vector Store (Example - choose one or more)
+# opensearch-py
+# llama-index-vector-stores-opensearch
+
+# News Fetching
+finnhub-python
+
+# Neo4j (Optional)
+# neo4j
+# llama-index-graph-stores-neo4j
+
+# Streamlit (Optional)
+# streamlit
+
+# Development & Testing
+# pytest 

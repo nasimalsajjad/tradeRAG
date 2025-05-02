@@ -1,0 +1,82 @@
+{
+    "0": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Vanguard Group Inc",
+        "pctHeld": 0.0929,
+        "Shares": 150210152,
+        "Value": 14875311169,
+        "pctChange": 0.0097
+    },
+    "1": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Blackrock Inc.",
+        "pctHeld": 0.081099994,
+        "Shares": 131025620,
+        "Value": 12975466988,
+        "pctChange": 0.0117
+    },
+    "2": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "State Street Corporation",
+        "pctHeld": 0.044099998,
+        "Shares": 71320801,
+        "Value": 7062898835,
+        "pctChange": 0.0164
+    },
+    "3": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Geode Capital Management, LLC",
+        "pctHeld": 0.0217,
+        "Shares": 35079256,
+        "Value": 3473898678,
+        "pctChange": 0.024400001
+    },
+    "4": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Morgan Stanley",
+        "pctHeld": 0.019,
+        "Shares": 30755582,
+        "Value": 3045725247,
+        "pctChange": 0.0117999995
+    },
+    "5": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Fisher Asset Management, LLC",
+        "pctHeld": 0.0149,
+        "Shares": 24086020,
+        "Value": 2385238531,
+        "pctChange": 0.012200001
+    },
+    "6": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "NORGES BANK",
+        "pctHeld": 0.0147,
+        "Shares": 23737003,
+        "Value": 2350675378,
+        "pctChange": 0.056799997
+    },
+    "7": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "UBS AM, a distinct business unit of UBS ASSET MANAGEMENT AMERICAS LLC",
+        "pctHeld": 0.013200001,
+        "Shares": 21401436,
+        "Value": 2119384180,
+        "pctChange": 0.0991
+    },
+    "8": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Price (T.Rowe) Associates Inc",
+        "pctHeld": 0.0111,
+        "Shares": 17893743,
+        "Value": 1772017347,
+        "pctChange": -0.4932
+    },
+    "9": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Northern Trust Corporation",
+        "pctHeld": 0.0106,
+        "Shares": 17155522,
+        "Value": 1698911322,
+        "pctChange": 0.20120001
+    }
+}

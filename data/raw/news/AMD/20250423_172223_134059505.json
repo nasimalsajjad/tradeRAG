@@ -1,0 +1,11 @@
+{
+    "category": "company",
+    "datetime": 1745443343,
+    "headline": "What's Going On With Marvell Technology Stock On Wednesday?",
+    "id": 134059505,
+    "image": "https://s.yimg.com/rz/stage/p/yahoo_finance_en-US_h_p_finance_2.png",
+    "related": "AMD",
+    "source": "Yahoo",
+    "summary": "Marvell Technology, Inc (NASDAQ:MRVL) on Wednesday announced the successful interoperability of the Marvell Structera portfolio of Compute Express Link (CXL) devices with Advanced Micro Devices, Inc (NASDAQ:AMD) EPYC CPUs and 5th Gen Intel Corp (NASDAQ:INTC) Intel Xeon platforms. The move marks Marvell’s progress towards an open and interoperable CXL ecosystem, which will address the growing demands for memory bandwidth and capacity in next-generation cloud data centers. Marvell tapped AMD and I",
+    "url": "https://finnhub.io/api/news?id=00fbe950cfaadae0a6e37f98b847af7abaaac1df416733263f7caf6b6a1b7a39"
+}

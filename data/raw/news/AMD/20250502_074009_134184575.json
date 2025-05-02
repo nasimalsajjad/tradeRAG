@@ -1,0 +1,11 @@
+{
+    "category": "company",
+    "datetime": 1746186009,
+    "headline": "This Week In AI Chips - Revolutionizing Power Integrity With Movellus PDN Analyzer",
+    "id": 134184575,
+    "image": "https://s.yimg.com/rz/stage/p/yahoo_finance_en-US_h_p_finance_2.png",
+    "related": "AMD",
+    "source": "Yahoo",
+    "summary": "Movellus has unveiled what it claims to be the industry's first on-chip power delivery network (PDN) analyzer, designed to enhance the performance and efficiency of system-on-chips (SoCs). The newly introduced Aeonic Insight PDN IQ aims to provide unprecedented transistor-level PDN visibility, addressing the critical challenge of power integrity across the entire lifecycle of semiconductors, from characterization to in-field monitoring. As SoCs become more complex, especially in the realm of...",
+    "url": "https://finnhub.io/api/news?id=d04802a040b90343fb1e39768edb03c2f646e459904778d33fa676117101a7c5"
+}
