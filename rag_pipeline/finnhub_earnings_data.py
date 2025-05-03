@@ -102,10 +102,12 @@ def main():
         return
 
     # Load API Key
-    load_dotenv()
+    # Load environment variables from config.env file in project root
+    dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
+    load_dotenv(dotenv_path=dotenv_path)
     api_key = os.getenv("FINNHUB_API_KEY")
     if not api_key:
-        print("Error: FINNHUB_API_KEY not found in environment variables (.env file).")
+        print("Error: FINNHUB_API_KEY not found in environment variables (config.env file).")
         return
 
     finnhub_client = finnhub.Client(api_key=api_key)

@@ -119,4 +119,7 @@ venv.bak/
 pyflow.lock
 
 # poetry
-poetry.lock 
+poetry.lock
+
+# Custom config files
+config.env # Ignore the renamed config file 

@@ -1,0 +1,42 @@
+[
+    {
+        "actual": 1.56,
+        "estimate": 1.4662,
+        "period": "2025-03-31",
+        "quarter": 2,
+        "surprise": 0.0938,
+        "surprisePercent": 6.3975,
+        "symbol": "MU",
+        "year": 2025
+    },
+    {
+        "actual": 1.79,
+        "estimate": 1.7845,
+        "period": "2024-12-31",
+        "quarter": 1,
+        "surprise": 0.0055,
+        "surprisePercent": 0.3082,
+        "symbol": "MU",
+        "year": 2025
+    },
+    {
+        "actual": 1.18,
+        "estimate": 1.1723,
+        "period": "2024-09-30",
+        "quarter": 4,
+        "surprise": 0.0077,
+        "surprisePercent": 0.6568,
+        "symbol": "MU",
+        "year": 2024
+    },
+    {
+        "actual": 0.62,
+        "estimate": 0.5238,
+        "period": "2024-06-30",
+        "quarter": 3,
+        "surprise": 0.0962,
+        "surprisePercent": 18.3658,
+        "symbol": "MU",
+        "year": 2024
+    }
+]

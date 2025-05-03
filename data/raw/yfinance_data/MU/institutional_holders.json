@@ -1,0 +1,82 @@
+{
+    "0": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Vanguard Group Inc",
+        "pctHeld": 0.08939999,
+        "Shares": 99857205,
+        "Value": 8060473709,
+        "pctChange": 0.009
+    },
+    "1": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Blackrock Inc.",
+        "pctHeld": 0.0857,
+        "Shares": 95823341,
+        "Value": 7734860202,
+        "pctChange": 0.014400001
+    },
+    "2": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "State Street Corporation",
+        "pctHeld": 0.0444,
+        "Shares": 49663333,
+        "Value": 4008824300,
+        "pctChange": 0.0298
+    },
+    "3": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "FMR, LLC",
+        "pctHeld": 0.0427,
+        "Shares": 47672462,
+        "Value": 3848121190,
+        "pctChange": 0.3458
+    },
+    "4": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Capital World Investors",
+        "pctHeld": 0.0368,
+        "Shares": 41096391,
+        "Value": 3317300731,
+        "pctChange": 0.6371
+    },
+    "5": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Primecap Management Company",
+        "pctHeld": 0.0336,
+        "Shares": 37596461,
+        "Value": 3034786377,
+        "pctChange": -0.0009
+    },
+    "6": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "JPMORGAN CHASE & CO",
+        "pctHeld": 0.028299998,
+        "Shares": 31646366,
+        "Value": 2554494702,
+        "pctChange": -0.069299996
+    },
+    "7": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Geode Capital Management, LLC",
+        "pctHeld": 0.0219,
+        "Shares": 24449827,
+        "Value": 1973590065,
+        "pctChange": 0.0306
+    },
+    "8": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "NORGES BANK",
+        "pctHeld": 0.0156,
+        "Shares": 17477130,
+        "Value": 1410753954,
+        "pctChange": 0.4966
+    },
+    "9": {
+        "Date Reported": "2024-12-31T00:00:00.000",
+        "Holder": "Morgan Stanley",
+        "pctHeld": 0.0149,
+        "Shares": 16601258,
+        "Value": 1340053566,
+        "pctChange": -0.094399996
+    }
+}

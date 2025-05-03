@@ -10,7 +10,9 @@ RAW_DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'new
 
 def fetch_news(ticker: str, start_date: str, end_date: str):
     """Fetches company news from Finnhub API for a given ticker and date range."""
-    load_dotenv() # Load environment variables from .env file
+    # Load environment variables from config.env file in project root
+    dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
+    load_dotenv(dotenv_path=dotenv_path)
     api_key = os.getenv("FINNHUB_API_KEY")
 
     if not api_key:
