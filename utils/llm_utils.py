@@ -6,23 +6,24 @@ import logging
 import time
 from dotenv import load_dotenv
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configure logging - REMOVING THIS LINE (should be configured in main script)
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # --- Constants ---
-DEFAULT_MAX_NEW_TOKENS = 500 # Increased from 300
+DEFAULT_MAX_NEW_TOKENS = 500 # Using this as max_tokens for OpenAI format
 DEFAULT_TEMPERATURE = 0.6
 RUNPOD_TIMEOUT = 180 # Timeout for RunPod API calls in seconds (adjust as needed)
 
 # --- Global Variables (Loaded from .env) ---
 _runpod_api_key = None
-_runpod_endpoint_id = None
-_runpod_url = None
+_runpod_pod_id = "55j0rcttb3ssv3" # Hardcoding the Pod ID provided
+_runpod_model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit" # Hardcoding model name
+_runpod_pod_url = None
 _is_configured = False
 
 def _load_runpod_config():
     """Loads RunPod configuration from environment variables."""
-    global _runpod_api_key, _runpod_endpoint_id, _runpod_url, _is_configured
+    global _runpod_api_key, _runpod_pod_url, _is_configured
     if _is_configured:
         return True
 
@@ -32,23 +33,24 @@ def _load_runpod_config():
     logging.info(f"Loaded .env from: {dotenv_path}")
 
     _runpod_api_key = os.getenv("RUNPOD_API_KEY")
-    _runpod_endpoint_id = os.getenv("RUNPOD_ENDPOINT_ID")
+    # We no longer need RUNPOD_ENDPOINT_ID for Pods
+    # _runpod_endpoint_id = os.getenv("RUNPOD_ENDPOINT_ID")
 
     if not _runpod_api_key:
         logging.error("RUNPOD_API_KEY not found in environment variables.")
         return False
-    if not _runpod_endpoint_id:
-        logging.error("RUNPOD_ENDPOINT_ID not found in environment variables.")
-        return False
+    # if not _runpod_endpoint_id: # No longer needed
+    #     logging.error("RUNPOD_ENDPOINT_ID not found in environment variables.")
+    #     return False
 
-    # Construct the RunPod API URL (using runsync for simplicity)
-    _runpod_url = f"https://api.runpod.ai/v2/{_runpod_endpoint_id}/runsync"
-    logging.info(f"RunPod endpoint configured: {_runpod_url}")
+    # Construct the RunPod Pod API URL (OpenAI compatible)
+    _runpod_pod_url = f"https://{_runpod_pod_id}-8000.proxy.runpod.net/v1/chat/completions"
+    logging.info(f"RunPod Pod endpoint configured: {_runpod_pod_url}")
     _is_configured = True
     return True
 
 def query_llm(prompt: str, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS, temperature: float = DEFAULT_TEMPERATURE) -> str | None:
-    """Queries the RunPod Serverless vLLM endpoint."""
+    """Queries the RunPod Pod OpenAI-compatible endpoint."""
     if not _load_runpod_config():
         logging.error("RunPod configuration failed. Cannot query LLM.")
         return None
@@ -62,79 +64,55 @@ def query_llm(prompt: str, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS, tempera
         "Content-Type": "application/json"
     }
 
-    # Construct the payload according to RunPod vLLM template expectations
-    # See: https://docs.runpod.io/serverless/endpoints/vllm
+    # Construct the payload according to OpenAI Chat Completions format
     payload = {
-        "input": {
-            "prompt": prompt,
-            "max_new_tokens": max_new_tokens,
-            "temperature": temperature,
-            # Add other vLLM supported parameters if needed:
-            # "top_p": 0.9,
-            # "stop": ["stop_sequence"],
-        }
+        "model": _runpod_model_name, # Specify the model
+        "messages": [
+            {"role": "user", "content": prompt} # Simple user message structure
+        ],
+        "max_tokens": max_new_tokens, # OpenAI uses max_tokens
+        "temperature": temperature,
+        # "stop": ["stop_sequence"], # Optional stop sequences
     }
 
-    logging.info(f"Querying RunPod LLM (Endpoint: {_runpod_endpoint_id}, max_new_tokens={max_new_tokens}, temp={temperature})...")
+    logging.info(f"Querying RunPod Pod LLM (URL: {_runpod_pod_url}, Model: {_runpod_model_name}, max_tokens={max_new_tokens}, temp={temperature})...")
     start_time = time.time()
 
     try:
-        response = requests.post(_runpod_url, headers=headers, json=payload, timeout=RUNPOD_TIMEOUT)
+        response = requests.post(_runpod_pod_url, headers=headers, json=payload, timeout=RUNPOD_TIMEOUT)
         response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
 
         end_time = time.time()
-        logging.info(f"RunPod LLM query completed in {end_time - start_time:.2f} seconds.")
+        logging.info(f"RunPod Pod LLM query completed in {end_time - start_time:.2f} seconds.")
 
         result = response.json()
 
-        # Process the response - check for errors reported by RunPod/vLLM
+        # Log the full response for debugging
+        logging.debug(f"Full RunPod response JSON: {json.dumps(result, indent=2)}")
+
+        # Process the response - check for errors from the API
         if "error" in result:
-            logging.error(f"RunPod endpoint returned an error: {result['error']}")
+            logging.error(f"RunPod Pod API returned an error: {result['error']}")
             return None
         
-        # Check the status and output (assuming OpenAI compatible structure)
-        if result.get("status") == "COMPLETED" and "output" in result:
-             output_data = result["output"]
-             # Handle potential list wrapping and OpenAI-like structure
-             if isinstance(output_data, list) and len(output_data) > 0:
-                  # Take the first item if it's a list
-                  output_data = output_data[0]
-
-             if isinstance(output_data, dict):
-                 if 'choices' in output_data and isinstance(output_data['choices'], list) and len(output_data['choices']) > 0:
-                     first_choice = output_data['choices'][0]
-                     if 'text' in first_choice: # Common structure
-                         generated_text = first_choice['text']
-                         return generated_text.strip() if isinstance(generated_text, str) else None
-                     elif 'message' in first_choice and 'content' in first_choice['message']:
-                         generated_text = first_choice['message']['content'] # Chat completion structure
-                         return generated_text.strip() if isinstance(generated_text, str) else None
-                     elif 'tokens' in first_choice and isinstance(first_choice['tokens'], list): # Sometimes raw tokens are returned
-                         generated_text = "".join(first_choice['tokens'])
-                         return generated_text.strip()
-
-                 # Fallback if structure is simpler (e.g., just {'text': '...'} )
-                 elif 'text' in output_data:
-                      generated_text = output_data['text']
-                      return generated_text.strip() if isinstance(generated_text, str) else None
-
-             # Handle case where output might be just the string directly
-             elif isinstance(output_data, str):
-                 return output_data.strip()
-
-             # If parsing failed
-             logging.warning(f"Could not parse expected text from RunPod output: {result['output']}")
-             return None
+        # Extract the response based on OpenAI Chat Completions structure
+        if 'choices' in result and isinstance(result['choices'], list) and len(result['choices']) > 0:
+            first_choice = result['choices'][0]
+            if 'message' in first_choice and 'content' in first_choice['message']:
+                generated_text = first_choice['message']['content']
+                return generated_text.strip() if isinstance(generated_text, str) else None
+            else:
+                logging.warning(f"Could not find 'content' in message of first choice: {first_choice}")
+                return None
         else:
-            logging.warning(f"RunPod job did not complete successfully or output missing. Status: {result.get('status')}")
-            logging.debug(f"Full RunPod response: {result}")
-            return None
+             logging.warning(f"Could not parse expected 'choices' structure from RunPod Pod output: {result}")
+             return None
 
     except requests.exceptions.Timeout:
-        logging.error(f"RunPod API request timed out after {RUNPOD_TIMEOUT} seconds.")
+        logging.error(f"RunPod Pod API request timed out after {RUNPOD_TIMEOUT} seconds.")
         return None
     except requests.exceptions.RequestException as e:
-        logging.error(f"Error during RunPod API request: {e}", exc_info=True)
+        logging.error(f"Error during RunPod Pod API request: {e}", exc_info=True)
         # Log response content if available for debugging non-200 status codes
         if hasattr(e, 'response') and e.response is not None:
              try:
@@ -147,12 +125,17 @@ def query_llm(prompt: str, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS, tempera
          return None
 
 # --- Example Usage (for direct script execution testing) ---
+# (Keep existing example usage, though it will now hit the Pod API)
 if __name__ == "__main__":
-    logging.info("Running example RunPod LLM query...")
+    # Ensure logging is configured if run directly
+    if not logging.getLogger().hasHandlers():
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    
+    logging.info("Running example RunPod Pod LLM query...")
     example_prompt = "Explain the concept of Retrieval-Augmented Generation in simple terms."
     print(f"Prompt: {example_prompt}")
     response = query_llm(example_prompt)
     if response:
         print(f"\nResponse:\n{response}")
     else:
-        print("\nFailed to get response from LLM via RunPod.") 
+        print("\nFailed to get response from LLM via RunPod Pod.") 

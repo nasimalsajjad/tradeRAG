@@ -5,12 +5,95 @@ import argparse
 import re
 from datetime import datetime
 from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
 # Define directories
 PROCESSED_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'processed')
 KG_INPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'kg_input')
 
-# --- Helper Functions (from chunk_index.py, modified) ---
+# --- Canonical Knowledge Base (Simple Example) ---
+# In production, load this from a file/database
+canonical_kb = {
+    "Company": {
+        "MU": {
+            "name": "Micron Technology, Inc.",
+            "aliases": ["Micron", "Micron Technology"]
+        },
+        "TSLA": {
+            "name": "Tesla, Inc.",
+            "aliases": ["Tesla"]
+        },
+        "AMD": {
+            "name": "Advanced Micro Devices, Inc.",
+            "aliases": ["AMD", "Advanced Micro Devices"]
+        },
+        # Add more known companies
+    },
+    # Can add "Person", etc. if doing embedding-based resolution for them
+}
+
+# --- Global Variables for Embeddings (Load once) ---
+_embedding_model = None
+_kb_embeddings = {} # Structure: {"Company": {"MU": [emb1, emb2...], "TSLA": [...]}}
+
+# --- Helper Functions ---
+
+def get_embedding_model(model_name="sentence-transformers/all-MiniLM-L6-v2"):
+    """Loads the sentence transformer model."""
+    global _embedding_model
+    if _embedding_model is None:
+        print(f"Loading embedding model: {model_name}...")
+        try:
+            _embedding_model = SentenceTransformer(model_name)
+            print("Embedding model loaded.")
+        except Exception as e:
+            print(f"Error loading embedding model {model_name}: {e}")
+            raise # Re-raise the exception to stop if model can't load
+    return _embedding_model
+
+def compute_kb_embeddings():
+    """Computes and stores embeddings for the canonical KB."""
+    global _kb_embeddings
+    if _kb_embeddings: # Only compute once
+        return
+
+    print("Computing embeddings for Canonical Knowledge Base...")
+    model = get_embedding_model()
+    if not model: return
+
+    embeddings_computed = 0
+    for entity_type, entities in canonical_kb.items():
+        if entity_type not in _kb_embeddings:
+            _kb_embeddings[entity_type] = {}
+        for entity_id, data in entities.items():
+            entity_embeddings = []
+            texts_to_embed = [data["name"]] + data.get("aliases", [])
+            try:
+                 # Compute embeddings in batch if possible
+                 computed = model.encode(texts_to_embed, convert_to_numpy=True)
+                 entity_embeddings.extend(computed)
+                 embeddings_computed += len(texts_to_embed)
+            except Exception as e:
+                 print(f"Error computing embedding for {entity_type} {entity_id}: {e}")
+            _kb_embeddings[entity_type][entity_id] = entity_embeddings
+
+    print(f"Computed {embeddings_computed} embeddings for KB.")
+
+def cosine_similarity(v1, v2):
+    """Computes cosine similarity between two numpy vectors."""
+    # Ensure inputs are numpy arrays
+    v1 = np.asarray(v1)
+    v2 = np.asarray(v2)
+    # Normalize vectors
+    norm_v1 = np.linalg.norm(v1)
+    norm_v2 = np.linalg.norm(v2)
+    if norm_v1 == 0 or norm_v2 == 0:
+        return 0.0 # Avoid division by zero
+    v1_normalized = v1 / norm_v1
+    v2_normalized = v2 / norm_v2
+    # Compute dot product
+    return np.dot(v1_normalized, v2_normalized)
 
 def load_processed_data_for_ner(ticker: str) -> list[dict]:
     """Loads processed data from the JSONL file for a ticker, returning list of dicts."""
@@ -140,26 +223,29 @@ def normalize_date(date_str: str):
     # print(f"Could not parse date: {date_str}")
     return None
 
-def resolve_entities(ner_results: list[dict], target_ticker: str):
-    """Basic entity resolution: filter types, normalize ORG to ticker."""
+def resolve_entities(ner_results: list[dict], target_ticker: str, similarity_threshold=0.85):
+    """Resolves entities using embedding similarity for ORGs and rules for others."""
     print("Starting Entity Resolution step...")
     resolved_data = []
     target_ticker = target_ticker.upper()
-    # Define known variations for the target ticker (case-insensitive)
-    # This should ideally come from a config or external source
-    org_variations = {
-        "AMD": ["amd", "advanced micro devices", "advanced micro devices, inc."],
-        "TSLA": ["tesla", "tesla, inc.", "tesla inc"],
-        "AAPL": ["apple", "apple inc", "apple computer"],
-        "MSFT": ["microsoft", "microsoft corporation"],
-        "NVDA": ["nvidia", "nvidia corporation"],
-        # Add more known tickers and variations
-    }
-    target_variations = [v.lower() for v in org_variations.get(target_ticker, [target_ticker.lower()])]
+
+    # Ensure KB embeddings are computed
+    try:
+        compute_kb_embeddings()
+        model = get_embedding_model() # Ensure model is loaded
+        if not model:
+             print("ERROR: Embedding model not available. Cannot perform embedding-based ER.")
+             return [] # Or handle differently
+    except Exception as load_err:
+         print(f"ERROR during embedding setup: {load_err}")
+         return []
 
     allowed_entity_types = {"ORG", "PER", "DATE", "MONEY"}
-
     processed_count = 0
+    
+    # Get precomputed Company embeddings from the global structure
+    company_kb_embeddings = _kb_embeddings.get("Company", {})
+
     for item in ner_results:
         resolved_entities = []
         original_entities = item.get("entities", [])
@@ -171,34 +257,53 @@ def resolve_entities(ner_results: list[dict], target_ticker: str):
             if entity_group in allowed_entity_types and entity_word:
                 resolved_entity = entity.copy()
 
-                # 1. ORG Normalization
+                # 1. ORG Normalization (Embedding-based)
                 if entity_group == "ORG":
-                    if entity_word.lower() in target_variations:
-                        resolved_entity["normalized_id"] = target_ticker
-                        resolved_entity["normalized_label"] = "Company" # Assign a graph label
-                    # Potential: Add logic here for other ORGs if needed (e.g., competitors, partners)
-                    # For now, only normalize the target ticker
-                    else:
-                         resolved_entity["normalized_label"] = "Organization"
+                    try:
+                        entity_embedding = model.encode(entity_word, convert_to_numpy=True)
+                        
+                        best_match_id = None
+                        max_similarity = -1.0 # Initialize with value lower than possible similarity
 
-                # 2. DATE Normalization (Basic Example)
+                        # Compare against canonical Company embeddings
+                        for canonical_id, kb_embed_list in company_kb_embeddings.items():
+                            for kb_embedding in kb_embed_list:
+                                sim = cosine_similarity(entity_embedding, kb_embedding)
+                                if sim > max_similarity:
+                                    max_similarity = sim
+                                    best_match_id = canonical_id
+                        
+                        # Apply threshold
+                        if max_similarity >= similarity_threshold:
+                            # Found a confident match to a known company
+                            resolved_entity["normalized_id"] = best_match_id
+                            resolved_entity["normalized_label"] = "Company"
+                            resolved_entity["match_score"] = float(max_similarity) # Store score
+                        else:
+                            # Not similar enough to a known company, treat as generic org
+                            resolved_entity["normalized_label"] = "Organization"
+                    except Exception as e:
+                         print(f"Error during ORG entity embedding/matching for '{entity_word}': {e}")
+                         resolved_entity["normalized_label"] = "Organization" # Fallback
+
+                # 2. DATE Normalization (Rule-based - Keep existing)
                 elif entity_group == "DATE":
                     normalized = normalize_date(entity_word)
                     if normalized:
                         resolved_entity["normalized_date"] = normalized
                     resolved_entity["normalized_label"] = "Date"
 
-                # 3. PERSON Normalization (Placeholder)
+                # 3. PERSON Normalization (Placeholder - Keep existing)
                 elif entity_group == "PER":
-                    # Simple pass-through, could add clustering/canonical names later
-                     resolved_entity["normalized_label"] = "Person"
+                    resolved_entity["normalized_label"] = "Person"
 
-                # 4. MONEY Normalization (Placeholder)
+                # 4. MONEY Normalization (Placeholder - Keep existing)
                 elif entity_group == "MONEY":
-                     # Simple pass-through, could add value/currency extraction later
-                     resolved_entity["normalized_label"] = "MonetaryAmount"
+                    resolved_entity["normalized_label"] = "MonetaryAmount"
 
-                resolved_entities.append(resolved_entity)
+                # Only append if a label was assigned
+                if "normalized_label" in resolved_entity:
+                     resolved_entities.append(resolved_entity)
 
         resolved_data.append({
             "metadata": item.get("metadata", {}),
@@ -206,7 +311,7 @@ def resolve_entities(ner_results: list[dict], target_ticker: str):
         })
         processed_count += 1
         if processed_count % 100 == 0:
-             print(f"  Resolved entities for {processed_count}/{len(ner_results)} documents...")
+            print(f"  Resolved entities for {processed_count}/{len(ner_results)} documents...")
 
     print(f"Finished Entity Resolution. Processed {len(resolved_data)} documents.")
     return resolved_data
