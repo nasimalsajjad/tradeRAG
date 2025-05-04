@@ -15,20 +15,20 @@ KG_INPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'kg_input')
 
 def get_neo4j_driver():
     """Establishes connection to Neo4j using environment variables."""
-    # Load .env file from the project root (assuming graph_ingestor.py is in rag_pipeline)
-    # dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
-    # load_dotenv(dotenv_path=dotenv_path)
-    # print(f"Loaded config.env from: {dotenv_path}") # Updated Debug print message slightly
+    # Load config.env file from the project root
+    dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
+    load_dotenv(dotenv_path=dotenv_path)
+    print(f"Loaded config.env from: {dotenv_path}")
 
-    # uri = os.getenv("NEO4J_URI")
-    # user = os.getenv("NEO4J_USERNAME")
-    # password = os.getenv("NEO4J_PASSWORD")
+    uri = os.getenv("NEO4J_URI")
+    user = os.getenv("NEO4J_USERNAME")
+    password = os.getenv("NEO4J_PASSWORD")
 
-    # --- HARDCODING NEO4J CREDS TO BYPASS DOTENV ISSUES ---
-    uri = "bolt://localhost:7687"
-    user = "neo4j"
-    password = "changeme123"
-    print("DEBUG: Using hardcoded credentials for Neo4j connection.")
+    # --- HARDCODING NEO4J CREDS TO BYPASS DOTENV ISSUES --- REMOVED
+    # uri = "bolt://localhost:7687"
+    # user = "neo4j"
+    # password = "changeme123"
+    # print("DEBUG: Using hardcoded credentials for Neo4j connection.")
     # ------------------------------------------------------
 
     print(f"Read from env: URI={uri}, User={user}, Password={'*' * len(password) if password else None}") # Debug print

@@ -38,19 +38,19 @@ VECTOR_STORE_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'vector
 # --- Neo4j Connection (Reusing logic from graph_ingestor) ---
 def get_neo4j_driver():
     """Establishes connection to Neo4j using environment variables."""
-    # Load .env file from the project root
-    # dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
-    # load_dotenv(dotenv_path=dotenv_path)
+    # Load config.env file from the project root
+    dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
+    load_dotenv(dotenv_path=dotenv_path)
 
-    # uri = os.getenv("NEO4J_URI")
-    # user = os.getenv("NEO4J_USERNAME")
-    # password = os.getenv("NEO4J_PASSWORD")
+    uri = os.getenv("NEO4J_URI")
+    user = os.getenv("NEO4J_USERNAME")
+    password = os.getenv("NEO4J_PASSWORD")
 
-    # --- TEMPORARY HARDCODED TEST ---
-    uri = "bolt://localhost:7687"
-    user = "neo4j"
-    password = "changeme123"
-    logging.info("DEBUG: Using hardcoded credentials for connection test in rag_chain.")
+    # --- TEMPORARY HARDCODED TEST --- REMOVED
+    # uri = "bolt://localhost:7687"
+    # user = "neo4j"
+    # password = "changeme123"
+    # logging.info("DEBUG: Using hardcoded credentials for connection test in rag_chain.")
     # --------------------------------
 
     if not uri or not user or not password:
