@@ -15,43 +15,35 @@ DEFAULT_TEMPERATURE = 0.6
 RUNPOD_TIMEOUT = 180 # Timeout for RunPod API calls in seconds (adjust as needed)
 
 # --- Global Variables (Loaded from .env) ---
-_runpod_api_key = None
-_runpod_pod_id = "55j0rcttb3ssv3" # Hardcoding the Pod ID provided
-_runpod_model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit" # Hardcoding model name
+_runpod_api_key = None # Keep loading this, might be needed for other RunPod API calls later
+_vllm_api_key = "sk-IrR7Bwxtin0haWagUnPrBgq5PurnUz86" # API key for vLLM endpoint itself
+_runpod_pod_id = "bhpsvsi3j3q0fm" # Hardcoding the new Pod ID provided
+_runpod_model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit" # Model name for this pod
 _runpod_pod_url = None
 _is_configured = False
 
 def _load_runpod_config():
     """Loads RunPod configuration from environment variables."""
     global _runpod_api_key, _runpod_pod_url, _is_configured
-    if _is_configured:
-        return True
+    # Only configure the URL part once, API key loading remains dynamic if needed
+    if _runpod_pod_url is None:
+        # Load .env file from the project root just for RUNPOD_API_KEY if other RunPod calls are needed
+        dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
+        load_dotenv(dotenv_path=dotenv_path)
+        logging.info(f"Loaded .env from: {dotenv_path}")
+        _runpod_api_key = os.getenv("RUNPOD_API_KEY") # Load the general RunPod key
+        # We no longer need RUNPOD_ENDPOINT_ID for Pods
 
-    # Load .env file from the project root
-    dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config.env')
-    load_dotenv(dotenv_path=dotenv_path)
-    logging.info(f"Loaded .env from: {dotenv_path}")
-
-    _runpod_api_key = os.getenv("RUNPOD_API_KEY")
-    # We no longer need RUNPOD_ENDPOINT_ID for Pods
-    # _runpod_endpoint_id = os.getenv("RUNPOD_ENDPOINT_ID")
-
-    if not _runpod_api_key:
-        logging.error("RUNPOD_API_KEY not found in environment variables.")
-        return False
-    # if not _runpod_endpoint_id: # No longer needed
-    #     logging.error("RUNPOD_ENDPOINT_ID not found in environment variables.")
-    #     return False
-
-    # Construct the RunPod Pod API URL (OpenAI compatible)
-    _runpod_pod_url = f"https://{_runpod_pod_id}-8000.proxy.runpod.net/v1/chat/completions"
-    logging.info(f"RunPod Pod endpoint configured: {_runpod_pod_url}")
-    _is_configured = True
-    return True
+        # Construct the RunPod Pod API URL (OpenAI compatible)
+        _runpod_pod_url = f"https://{_runpod_pod_id}-8000.proxy.runpod.net/v1/chat/completions"
+        logging.info(f"RunPod Pod endpoint configured: {_runpod_pod_url}")
+        _is_configured = True # Mark basic config as done
+        
+    return True # Always return true once URL is set
 
 def query_llm(prompt: str, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS, temperature: float = DEFAULT_TEMPERATURE) -> str | None:
-    """Queries the RunPod Pod OpenAI-compatible endpoint."""
-    if not _load_runpod_config():
+    """Queries the RunPod Pod OpenAI-compatible endpoint using the vLLM-specific API key."""
+    if not _load_runpod_config(): # Ensure URL is configured
         logging.error("RunPod configuration failed. Cannot query LLM.")
         return None
 
@@ -59,8 +51,12 @@ def query_llm(prompt: str, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS, tempera
         logging.warning("Received empty or invalid prompt.")
         return None
 
+    if not _vllm_api_key: # Check if the vLLM key is set
+        logging.error("vLLM API Key is not set in llm_utils.py. Cannot authenticate with the Pod.")
+        return None
+        
     headers = {
-        "Authorization": f"Bearer {_runpod_api_key}",
+        "Authorization": f"Bearer {_vllm_api_key}", # Use the vLLM specific key
         "Content-Type": "application/json"
     }
 

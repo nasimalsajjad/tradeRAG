@@ -1,20 +1,10 @@
-fastapi
-uvicorn[standard]
 python-dotenv
 
-# RAG & LLM
-langchain
-llama-index
-openai
-llama-index-embeddings-huggingface
-sentence-transformers
-torch
-
-# Data Fetching
-sec-edgar-downloader
-finnhub-python
-yfinance
-
+# Data Loaders & Fetchers
+sec-edgar-downloader>=3.1.7
+yfinance>=0.2.35
+beautifulsoup4>=4.12.2
+requests
 # Vector Store (Example - choose one or more)
 # opensearch-py
 # llama-index-vector-stores-opensearch
@@ -22,12 +12,32 @@ yfinance
 # News Fetching
 finnhub-python
 
-# Neo4j (Optional)
-# neo4j
-# llama-index-graph-stores-neo4j
+# Neo4j
+neo4j # Driver needed for graph interaction
+# llama-index-graph-stores-neo4j # We are using direct driver for now
+
+# SpaCy for NER
+spacy
 
 # Streamlit (Optional)
 # streamlit
+
+# LlamaIndex Core + Embeddings
+llama-index==0.10.42 # Pinned for stability, update as needed
+sentence-transformers==2.7.0 # Pinned
+
+# --- API ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# RAG & LLM
+langchain
+openai
+llama-index-embeddings-huggingface
+torch
+
+# Finnhub
+finnhub-python
 
 # Development & Testing
 # pytest 

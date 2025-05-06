@@ -4,7 +4,9 @@ import json
 import argparse
 import re
 from datetime import datetime
-from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
+# Remove transformers imports
+# from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
+import spacy # Add spacy import
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
@@ -133,33 +135,49 @@ def load_processed_data_for_ner(ticker: str) -> list[dict]:
 
 # --- NER Logic ---
 
-def run_ner(documents_data: list[dict], model_name="Jean-Baptiste/roberta-large-ner-english"):
-    """Runs NER on the text field of each document dictionary."""
+def run_ner(documents_data: list[dict], model_name="en_core_web_trf"): # Changed default model name
+    """Runs NER on the text field of each document dictionary using spaCy."""
     if not documents_data:
         print("No documents provided for NER.")
         return []
 
-    print(f"Initializing NER pipeline with model: {model_name}...")
-    # Explicitly load tokenizer and model
+    print(f"Initializing spaCy NER model: {model_name}...")
     try:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForTokenClassification.from_pretrained(model_name)
-        # Use device=0 if CUDA is available and desired, otherwise defaults to CPU
-        # ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="simple", device=0)
-        ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="simple")
-        print(f"NER pipeline initialized on device: {ner_pipeline.device}")
-    except Exception as e:
-        print(f"Error initializing NER pipeline: {e}")
-        print("Check model name and internet connection.")
-        # Consider installing required packages if missing: pip install torch torchvision torchaudio (or tensorflow/flax)
+        # Load the spaCy model
+        # Consider adding download instructions if model not found:
+        # spacy.cli.download(model_name)
+        nlp = spacy.load(model_name)
+        print(f"spaCy NER model '{model_name}' loaded successfully.")
+        # Increase the max length limit after loading
+        nlp.max_length = 1500000
+        print(f"Increased nlp.max_length to {nlp.max_length}")
+        # Check if GPU is available and enabled for spaCy if desired
+        # Example: spacy.require_gpu() -> True if available
+        # Check loaded pipeline components
+        print(f"Loaded spaCy pipeline components: {nlp.pipe_names}")
+        if 'ner' not in nlp.pipe_names:
+            print(f"Warning: 'ner' component not found in the loaded spaCy model '{model_name}'.")
+            # You might want to handle this case, e.g., by returning [] or raising an error
+            # return []
+
+    except OSError as e:
+        print(f"Error loading spaCy model '{model_name}': {e}")
+        print(f"Please ensure the model is downloaded, e.g., run: python -m spacy download {model_name}")
         return []
+    except Exception as e:
+        print(f"An unexpected error occurred during spaCy model loading: {e}")
+        return []
+
 
     results = []
     print(f"Running NER on {len(documents_data)} documents...")
     for i, doc_data in enumerate(documents_data):
         metadata = doc_data.get("metadata", {})
         source_file_info = f"(source: {metadata.get('source_file', 'unknown')})"
-        if i % 50 == 0 and i > 0: # Print progress
+        # Log progress more frequently initially, then less often
+        if i < 25 and i % 5 == 0: # Log every 5 docs for the first 25
+            print(f"  Processed {i}/{len(documents_data)} documents...")
+        elif i >= 25 and i % 50 == 0: # Log every 50 docs after the first 25
             print(f"  Processed {i}/{len(documents_data)} documents...")
 
         text = doc_data.get("text")
@@ -168,31 +186,36 @@ def run_ner(documents_data: list[dict], model_name="Jean-Baptiste/roberta-large-
             results.append({"metadata": metadata, "entities": []})
             continue
 
+        # spaCy handles text length internally, but consider limits for very large texts
+        # max_length = nlp.max_length
+        # if len(text) > max_length:
+        #     print(f"Warning: Text for document {i} exceeds model max length ({max_length}), truncating.")
+        #     text = text[:max_length]
+
         try:
-             # Truncate long texts to avoid potential issues with model limits
-             # RoBERTa's max sequence length is typically 512 tokens.
-             # We truncate characters generously here; pipeline might handle tokenization limits better.
-            max_chars = 3000 # Adjust as needed
-            truncated_text = text[:max_chars]
-            if len(text) > max_chars:
-                # Don't print truncation warning every time unless debugging
-                pass # print(f"  Warning: Truncating text for document {i} {source_file_info}")
+            # Apply spaCy NER
+            doc = nlp(text)
 
-            # Apply NER - Use try-except per document
-            entities = ner_pipeline(truncated_text)
+            # Extract entities in the format expected by resolve_entities
+            extracted_entities = []
+            if doc.ents:
+                for ent in doc.ents:
+                    extracted_entities.append({
+                        'word': ent.text,
+                        'entity_group': ent.label_, # spaCy uses label_
+                        'start': ent.start_char,
+                        'end': ent.end_char,
+                        'score': 1.0 # spaCy entities don't have built-in scores like HF pipeline
+                    })
 
-            # Convert scores to standard floats for JSON serialization
-            serializable_entities = []
-            if entities:
-                for entity in entities:
-                    # Ensure score exists and convert
-                    entity['score'] = float(entity.get('score', 0.0))
-                    serializable_entities.append(entity)
-
-            results.append({"metadata": metadata, "entities": serializable_entities})
+            results.append({"metadata": metadata, "entities": extracted_entities})
 
         except Exception as e:
-             print(f"Error processing document {i} {source_file_info} with NER: {e}")
+             # Consider more specific error handling if needed
+             print(f"Error processing document {i} {source_file_info} with spaCy NER: {e}")
+             # Check for potential memory issues with large documents
+             if "MemoryError" in str(e):
+                 print("  Potential MemoryError encountered. Consider processing smaller text chunks.")
              results.append({"metadata": metadata, "entities": []}) # Add empty entities on error
 
 
@@ -321,7 +344,8 @@ def resolve_entities(ner_results: list[dict], target_ticker: str, similarity_thr
 def main():
     parser = argparse.ArgumentParser(description="Run NER and Entity Resolution on processed data.")
     parser.add_argument("-t", "--ticker", type=str, required=True, help="Stock ticker symbol to process (e.g., AMD)")
-    parser.add_argument("--ner_model", type=str, default="Jean-Baptiste/roberta-large-ner-english", help="NER model name from Hugging Face.")
+    # Updated default and help text for the NER model argument
+    parser.add_argument("--ner_model", type=str, default="en_core_web_trf", help="SpaCy NER model name (e.g., en_core_web_sm, en_core_web_lg, en_core_web_trf). Ensure it's downloaded.")
     # Add ER model name argument later
 
     args = parser.parse_args()
@@ -370,4 +394,17 @@ def main():
 
 
 if __name__ == "__main__":
+    # Optional: Add a check/download for the default spacy model if needed
+    # try:
+    #     spacy.load("en_core_web_trf")
+    # except OSError:
+    #     print("Default spaCy model 'en_core_web_trf' not found.")
+    #     print("Downloading model...")
+    #     try:
+    #         spacy.cli.download("en_core_web_trf")
+    #         print("Model downloaded successfully.")
+    #     except Exception as download_err:
+    #         print(f"Failed to download model: {download_err}")
+    #         # Decide whether to exit or continue
+    #         # exit(1)
     main() 

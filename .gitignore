@@ -123,3 +123,6 @@ poetry.lock
 
 # Custom config files
 config.env # Ignore the renamed config file 
+
+# Generated Data 
+data/ 
